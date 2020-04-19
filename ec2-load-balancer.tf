@@ -1,5 +1,5 @@
 # Load Balancer
-# 
+#
 # HTTPS is terminated at the load balancer.  The load balancer will then communicate
 # with the targets over HTTP.  The Targets (vault instances) are in a private
 # subnet, cut off from any external access.  This means that they're still perfectly
@@ -10,42 +10,42 @@ resource "aws_lb" "alb" {
   // Can't give it a full name_prefix due to 32 character limit on LBs
   // and the fact that Terraform adds a 26 character random bit to the end.
   // https://github.com/terraform-providers/terraform-provider-aws/issues/1666
-  name_prefix = "vault-"
-  internal = var.private_mode
+  name_prefix        = "vault-"
+  internal           = var.private_mode
   load_balancer_type = "application"
-  security_groups = [aws_security_group.load_balancer.id]
-  subnets = aws_subnet.public.*.id
-  idle_timeout = 60
-  ip_address_type = var.private_mode ? "ipv4" : "dualstack"
+  security_groups    = [aws_security_group.load_balancer.id]
+  subnets            = aws_subnet.public.*.id
+  idle_timeout       = 60
+  ip_address_type    = var.private_mode ? "ipv4" : "dualstack"
 
   tags = merge(
-    { "Name" = "${var.main_project_tag}-alb"},
+    { "Name" = "${var.main_project_tag}-alb" },
     { "Project" = var.main_project_tag }
   )
 }
 
 ## Target Group
 resource "aws_lb_target_group" "alb_targets" {
-  name_prefix = "vault-"
-  port = 8200
-  protocol = "HTTP"
-  vpc_id = aws_vpc.vault.id
+  name_prefix          = "vault-"
+  port                 = 8200
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.vault.id
   deregistration_delay = 30
-  target_type = "instance"
+  target_type          = "instance"
 
   health_check {
-    enabled = true
-    interval = 10
-    path = "/v1/sys/health" // the Vault API health port
-    protocol = "HTTP"
-    timeout = 5
-    healthy_threshold = 3
+    enabled             = true
+    interval            = 10
+    path                = "/v1/sys/health" // the Vault API health port
+    protocol            = "HTTP"
+    timeout             = 5
+    healthy_threshold   = 3
     unhealthy_threshold = 3
-    matcher = "200"
+    matcher             = "200"
   }
 
   tags = merge(
-    { "Name" = "${var.main_project_tag}-tg"},
+    { "Name" = "${var.main_project_tag}-tg" },
     { "Project" = var.main_project_tag }
   )
 }
@@ -55,8 +55,8 @@ resource "aws_lb_target_group" "alb_targets" {
 ### Redirect to HTTPS
 resource "aws_lb_listener" "alb_http_redirect" {
   load_balancer_arn = aws_lb.alb.arn
-  port = 80
-  protocol = "HTTP"
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
     type = "redirect"
@@ -64,11 +64,11 @@ resource "aws_lb_listener" "alb_http_redirect" {
     // For information on the below reserved keywords
     // https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#rule-action-types
     redirect {
-      host = "#{host}"
-      path = "/#{path}"
-      port = 443
-      protocol = "HTTPS"
-      query = "#{query}"
+      host        = "#{host}"
+      path        = "/#{path}"
+      port        = 443
+      protocol    = "HTTPS"
+      query       = "#{query}"
       status_code = "HTTP_301"
     }
   }
@@ -77,13 +77,13 @@ resource "aws_lb_listener" "alb_http_redirect" {
 ### HTTPS
 resource "aws_lb_listener" "alb_https" {
   load_balancer_arn = aws_lb.alb.arn
-  port = 443
-  protocol = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-FS-2018-06" // Enable Forward Secrecy
-  certificate_arn = data.aws_acm_certificate.vault_alb_cert.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-FS-2018-06" // Enable Forward Secrecy
+  certificate_arn   = data.aws_acm_certificate.vault_alb_cert.arn
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.alb_targets.arn
   }
 }

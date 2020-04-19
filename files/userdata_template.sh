@@ -1,8 +1,10 @@
-Content-Type: multipart/mixed; boundary="==BOUNDARY=="
+Content-Type: multipart/mixed
+boundary="==BOUNDARY=="
 MIME-Version: 1.0
 
 --==BOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
+Content-Type: text/x-shellscript
+charset="us-ascii"
 
 #!/bin/bash
 
@@ -54,7 +56,8 @@ ln -s /opt/vault/bin/vault /usr/local/bin/vault
 setcap cap_ipc_lock=+ep /opt/vault/bin/vault
 
 --==BOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
+Content-Type: text/x-shellscript
+charset="us-ascii"
 
 #!/bin/bash
 
@@ -66,7 +69,7 @@ Content-Type: text/x-shellscript; charset="us-ascii"
 # - Make the systemd service file
 
 # The vault config file
-cat > /opt/vault/config/server.hcl <<- EOF
+cat >/opt/vault/config/server.hcl <<-EOF
 cluster_name = "${VAULT_CLUSTER_NAME}"
 max_lease_ttl = "192h"
 default_lease_ttl = "192h"
@@ -110,7 +113,7 @@ EOF
 chwon vault:vault /opt/vault/config/server.hcl
 
 # The systemd service file
-cat > /etc/systemd/system/vault.service <<- EOF
+cat >/etc/systemd/system/vault.service <<-EOF
 [Unit]
 Description=Vault Server on AWS
 Requires=network-online.target
@@ -144,7 +147,8 @@ WantedBy=multi-user.target
 EOF
 
 --==BOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
+Content-Type: text/x-shellscript
+charset="us-ascii"
 
 #!/bin/bash
 
@@ -163,7 +167,8 @@ systemctl enable vault
 systemctl restart vault
 
 --==BOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
+Content-Type: text/x-shellscript
+charset="us-ascii"
 
 #!/bin/bash
 
@@ -186,12 +191,12 @@ export AWS_DEFAULT_REGION="${VAULT_CLUSTER_REGION}"
 
 VAULT_INITIALIZED=$(vault operator init -status)
 
-function initialize_vault {
+function initialize_vault() {
   # initialize and pipe to file
-  vault operator init > vault_credentials.txt
+  vault operator init >vault_credentials.txt
 
   # encrypt it with the KMS key
-  aws kms encrypt --key-id ${VAULT_KMS_KEY_ID} --plaintext fileb://vault_credentials.txt --output text --query CiphertextBlob | base64 --decode > vault_creds_encrypted
+  aws kms encrypt --key-id ${VAULT_KMS_KEY_ID} --plaintext fileb://vault_credentials.txt --output text --query CiphertextBlob | base64 --decode >vault_creds_encrypted
 
   # send the encrypted file to the s3 bucket
   aws s3 cp vault_creds_encrypted s3://${VAULT_S3_BUCKET_NAME}/

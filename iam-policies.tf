@@ -3,7 +3,7 @@
 ## KMS Policy
 data "aws_iam_policy_document" "kms_vault_policy" {
   statement {
-    sid = "EncryptDecryptAndDescribe"
+    sid    = "EncryptDecryptAndDescribe"
     effect = "Allow"
     actions = [
       "kms:Decrypt",
@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "kms_vault_policy" {
 ## DynamoDB Policy
 data "aws_iam_policy_document" "dynamodb_vault_policy" {
   statement {
-    sid = "ManageTable"
+    sid    = "ManageTable"
     effect = "Allow"
     actions = [
       "dynamodb:BatchGetItem",
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "dynamodb_vault_policy" {
   }
 
   statement {
-    sid = "GetStreamRecords"
+    sid    = "GetStreamRecords"
     effect = "Allow"
     actions = [
       "dynamodb:GetRecords"
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "dynamodb_vault_policy" {
   }
 
   statement {
-    sid = "QueryAndScanTable"
+    sid    = "QueryAndScanTable"
     effect = "Allow"
     actions = [
       "dynamodb:Scan",
@@ -66,7 +66,7 @@ data "aws_iam_policy_document" "dynamodb_vault_policy" {
 
 data "aws_iam_policy_document" "s3_vault_policy" {
   statement {
-    sid = "PutObjects"
+    sid    = "PutObjects"
     effect = "Allow"
     actions = [
       "s3:PutObject"

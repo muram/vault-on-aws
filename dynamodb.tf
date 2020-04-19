@@ -1,10 +1,10 @@
 # DynamoDB
 
 resource "aws_dynamodb_table" "vault_storage" {
-  name = var.dynamodb_table_name
+  name         = var.dynamodb_table_name
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "Path"
-  range_key = "Key"
+  hash_key     = "Path"
+  range_key    = "Key"
 
   attribute {
     name = "Path"
@@ -17,7 +17,7 @@ resource "aws_dynamodb_table" "vault_storage" {
   }
 
   tags = {
-    Name = var.dynamodb_table_name
+    Name    = var.dynamodb_table_name
     Project = var.main_project_tag
   }
 }
