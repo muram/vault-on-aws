@@ -38,6 +38,16 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_cred_file" {
+  description = "Path to aws credentials file."
+  default     = "~/.aws/credentials"
+}
+
+variable "aws_assume_role_arn" {
+  description = "IAM role ARN to assume into the account."
+  type        = string
+}
+
 # Vault Version
 
 variable "vault_version" {
@@ -83,7 +93,7 @@ variable "allowed_traffic_cidr_blocks" {
 variable "allowed_traffic_cidr_blocks_ipv6" {
   description = "List of IPv6 CIDR blocks allowed to send requests to your vault endpoint.  Defaults to EVERYWHERE.  Set to an empty list if not required."
   type        = list(string)
-  default     = ["::/0"]
+  default     = []
 }
 
 ## What IP Address range can access your bastion server?
